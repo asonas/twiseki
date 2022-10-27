@@ -18,8 +18,8 @@ async function getProfile(screenName){
       if (response.url().indexOf("UserByScreenName") > 0){
         const text = await response.text();
         const json = JSON.parse(text);
-        result = json.data.user.legacy;
-        result.user_id_str = json.data.user.rest_id;
+        result = json.data.user.result.legacy;
+        result.user_id_str = json.data.user.result.rest_id;
         page.off('response', getUserByScreenName);
       }
     } catch (error) {
@@ -46,10 +46,18 @@ async function getTimeline(screenName, scroll){
   let result = {};
   async function getTimelineRes(response){
     try {
-      if (response.url().indexOf("https://api.twitter.com/2/timeline/profile/") >= 0){
+      if (response.url().indexOf("UserTweets") >= 0){
         const text = await response.text();
         const json = JSON.parse(text);
-        Object.assign(result, json.globalObjects.tweets);
+        json.data.user.result.timeline_v2.timeline.instructions.forEach(instruction => {
+          if (instruction.type == "TimelineAddEntries") {
+            instruction.entries.forEach(entry => {
+              if (!!entry.content.itemContent) {
+                Object.assign(result, entry.content.itemContent.tweet_results.result.legacy)
+              }
+            })
+            }
+        })
       }
     } catch (error) {
     }
