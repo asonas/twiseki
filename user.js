@@ -28,6 +28,10 @@ async function getProfile(screenName){
   const url = getUserPageUrl(screenName);
   browser = await puppeteer.launch();
   const [page] = await browser.pages();
+  await page.setUserAgent(
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+  )
+
   page.on('response', getUserByScreenName);
   await page.goto(url, {waitUntil: 'networkidle0'});
   await browser.close();
@@ -55,9 +59,11 @@ async function getTimeline(screenName, scroll){
   const [page] = await browser.pages();
   page.on('response', getTimelineRes);
   await page.goto(url, {waitUntil: 'networkidle2'});
+  await page.setUserAgent(
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+  )
   await utils.autoScroll(page);
   await browser.close();
   return result;
 }
 exports.getTimeline = getTimeline;
-
